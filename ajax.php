@@ -105,6 +105,36 @@
         }
 
 
+        function AjaxAsignarRepartidor(){
+
+            require_once("curl.php");
+            if (!isset($_SESSION)) {
+                session_start();
+            }
+
+            $ArrayCadena = array();
+
+            // pedido, historial, idRepartidor
+
+            $pedido = $_POST['text'];
+            $idRepartidor = $_POST['text2'];
+            $historial = "Esta asignación fue realizada desde administración";
+
+            $ArrayCadena["pedido"] = $pedido;
+            $ArrayCadena["idRepartidor"] = $idAfiliado;
+            $ArrayCadena["historial"] = $historial;
+
+            $header = array('Content-Type: application/x-www-form-urlencoded');
+            $url = "https://api.aqupe.com/v1/repartidor/asignarPedido/token";
+            
+            $curl = new newCurl();
+            //$solicitudes = $curl->curlPost($url,$header,$ArrayCadena);
+            $response = $curl->curlPost($url,$header,$ArrayCadena);
+            //$response = $solicitudes;
+            return $response;
+        }
+
+
 
         
     }

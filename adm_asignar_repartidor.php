@@ -116,7 +116,6 @@
 
                 <?php
                     foreach ($responseRepartidor as $key => $val) {
-                        
                         echo  
                             '<tr>'.
                                 '<td>'.$val["id"].'</td>'.
@@ -125,8 +124,8 @@
                                 '<td>'.$val["telefono"].' / '.$val["telefono2"].'</td>'.
 
                                 '<td>'. 
-                                    '<label class="ui green tag label" style="margin-right: 3%;"> <input class="inpOpcion btnActivo" type="checkbox" id="A'.$val["id"].'" name="estados" value="Activo"> Activo</label>'.
-                                    '<label class="ui orange tag label" style="margin-right: 3%;"> <input class="inpOpcion btnPendiente" type="checkbox" id="P'.$val["id"].'" name="estados" value="Pendiente"> Pendiente</label>'.
+                                    '<label class="ui green tag label" style="margin-right: 3%;"> <input class="inpOpcion btnAsignado" type="checkbox" id="A'.$val["id"].'" name="estados" value="Asignado"> Asignado</label>'.
+                                    '<label class="ui orange tag label" style="margin-right: 3%;"> <input class="inpOpcion btnNoDisponible" type="checkbox" id="P'.$val["id"].'" name="estados" value="NoDisponible"> No Disponible</label>'.
                                     '<label class="ui red tag label"> <input class="inpOpcion btnNoActivo" checked type="checkbox" id="N'.$val["id"].'" name="estados" value="NoActivo"> No Activo</label>'.
                                 '</td>'
                             .'</tr>';
@@ -149,41 +148,84 @@
 
     <script>
         var datoI = "";
-        //var datoINPUT = "";
+        var datoINPUT = "";
         //var IDNoActivo = "";
         $(document).ready(function(){
-            //BOTON 1 --------------------------------------------------------------------------
+            //MODAL ASIGNAR REPARTIDOR --------------------------------------------------------------------------
             $(".btnAsignarRepartidor").click(function() {
                 datoI = $(this).closest('i').attr('id');
                 console.log(datoI);
                 $('.modal.Ventana1').modal('setting', 'closable', false).modal('show');
             });
 
-            $('.btnActivo').click(function(){
-
-                /*var dd1 = document.getElementsByClassName("btnActivo")[0].id;
-                var dd2 = document.getElementsByClassName("btnPendiente")[0].id;
-                var dd3 = $('.btnActivo').closest('.btnNoActivo').attr('id')*/
-
-                console.log(dd3);
-                $(dd3).attr('checked', true);
-
-                //Obtener ID del checkbox "No Activo"
-                /*var dd = document.getElementsByClassName("btnNoActivo")[0].id;
-                //var datoINPUT = $(this).closest('.btnActivo').attr('id');*/
-                
-                if ($(this).prop('checked')) {
-                    //dd.checked = 0;
-                    $('.btnNoActivo').prop('checked', false);
-                    //console.log(dd.checked);
+            //CHECKBOX DE ESTADOS - ASIGNAR REPARTIDOR --------------------------------------------------------------------------
+            $('.btnAsignado').click(function(){
+                if ($('this').prop('checked')) {
+                    datoINPUT = $(this).closest('.btnAsignado').attr('id');
+                    console.log(datoINPUT);
+                    $(this).closest("tr").find('.btnNoDisponible').prop('checked', false); //Desmarcar casilla por default
+                    $(this).closest("tr").find('.btnNoActivo').prop('checked', false); //Desmarcar casilla por default
                 }
-                //console.log(dd);
+            });
+
+            $('.btnNoDisponible').click(function(){
+                if ($(this).prop('checked')) {
+                    $(this).closest("tr").find('.btnAsignado').prop('checked', false); //Desmarcar casilla por default
+                    $(this).closest("tr").find('.btnNoActivo').prop('checked', false); //Desmarcar casilla por default
+                }
+            });
+
+            $('.btnNoActivo').click(function(){
+                if ($(this).prop('checked')) {
+                    $(this).closest("tr").find('.btnAsignado').prop('checked', false); //Desmarcar casilla por default
+                    $(this).closest("tr").find('.btnNoDisponible').prop('checked', false); //Desmarcar casilla por default
+                }
+            });
+
+
+            //ASIGNAR REPARTIDOR DE LA LISTA-----------------------------------------------
+            $('.AccionAsignar').click(function(){
+                var Pedido = "";
+                var idRepartidor = datoINPUT;
+                var historial = "";
+                let Caracter = "";
+
+                console.log(datoINPUT);
+
+                for (let i = 0; i < datoTR.length; i++) {
+                    Caracter = datoI.substr(i,1);
+
+                    if(Caracter!="-"){
+                        Pedido = Pedido + Caracter;
+                    }
+                }
+
+                $.ajax({
+                    method: "POST",
+                    url: "ajax.php",
+                    data: {funcion: "enviar", text: Pedido, text2: idRepartidor},
+                    success: function(response) {
+                        console.log(response);
+                        if (response.error === true) {
+                            alert(response.message);
+                        }else{
+                            document.getElementById("TR"+Pedido+"-"+IdAfiliado).remove();
+                            
+                        }
+                    }
+                });
+
+                console.log("Pedido:"+Pedido);
+                console.log("Afiliado: "+IdAfiliado);
 
             });
 
         })
 
         /*
+
+
+
             $('.AccionConfirmar').click(function(){
                 var Pedido = "";
                 var IdAfiliado = "";
